@@ -18,7 +18,7 @@ interface CardStackProps {
 function HeartBurst({ onComplete }: { onComplete: () => void }) {
   return (
     <motion.div
-      className="absolute inset-0 flex items-center justify-center pointer-events-none z-20"
+      className="absolute inset-0 flex items-center justify-center pointer-events-none z-30"
       initial={{ opacity: 1 }}
       animate={{ opacity: 0 }}
       transition={{ duration: 0.8 }}
@@ -83,18 +83,16 @@ function SwipeHint({ direction }: { direction: "left" | "right" }) {
   );
 }
 
-function DraggableCard({
+function TopCard({
   story,
   onSwipe,
-  isTop,
 }: {
   story: Story;
   onSwipe: (direction: "left" | "right") => void;
-  isTop: boolean;
 }) {
   const x = useMotionValue(0);
   const rotate = useTransform(x, [-300, 0, 300], [-25, 0, 25]);
-  const opacity = useTransform(
+  const cardOpacity = useTransform(
     x,
     [-300, -100, 0, 100, 300],
     [0.5, 1, 1, 1, 0.5]
@@ -107,6 +105,7 @@ function DraggableCard({
   });
 
   const [hint, setHint] = useState<"left" | "right" | null>(null);
+  const [exitDir, setExitDir] = useState<"left" | "right">("left");
 
   const handleDrag = useCallback(() => {
     const dir = swipeDirection.get();
@@ -117,27 +116,19 @@ function DraggableCard({
     (_: MouseEvent | TouchEvent | PointerEvent, info: PanInfo) => {
       const threshold = 100;
       if (Math.abs(info.offset.x) > threshold) {
-        onSwipe(info.offset.x > 0 ? "right" : "left");
+        const dir = info.offset.x > 0 ? "right" : "left";
+        setExitDir(dir);
+        onSwipe(dir);
       }
       setHint(null);
     },
     [onSwipe]
   );
 
-  if (!isTop) {
-    return (
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="w-full scale-[0.95] opacity-60">
-          <StoryCard story={story} />
-        </div>
-      </div>
-    );
-  }
-
   return (
     <motion.div
-      className="absolute inset-0 flex items-center justify-center cursor-grab active:cursor-grabbing"
-      style={{ x, rotate, opacity }}
+      className="absolute inset-0 z-10 flex items-center justify-center cursor-grab active:cursor-grabbing"
+      style={{ x, rotate, opacity: cardOpacity }}
       drag="x"
       dragConstraints={{ left: 0, right: 0 }}
       dragElastic={0.9}
@@ -145,7 +136,12 @@ function DraggableCard({
       onDragEnd={handleDragEnd}
       initial={{ scale: 0.95, opacity: 0 }}
       animate={{ scale: 1, opacity: 1 }}
-      exit={{ x: hint === "right" ? 400 : -400, opacity: 0, rotate: hint === "right" ? 30 : -30 }}
+      exit={{
+        x: exitDir === "right" ? 500 : -500,
+        opacity: 0,
+        rotate: exitDir === "right" ? 30 : -30,
+        transition: { duration: 0.3 },
+      }}
       transition={{ type: "spring", stiffness: 300, damping: 30 }}
     >
       <AnimatePresence>
@@ -174,57 +170,69 @@ export default function CardStack({ stories }: CardStackProps) {
     []
   );
 
-  const visibleStories = stories.slice(currentIndex, currentIndex + 2);
+  const topStory = stories[currentIndex];
+  const nextStory = stories[currentIndex + 1];
   const isFinished = currentIndex >= stories.length;
 
   return (
-    <div className="relative w-full max-w-md mx-auto" style={{ height: "70vh", minHeight: 500 }}>
+    <div
+      className="relative w-full max-w-md mx-auto"
+      style={{ height: "70vh", minHeight: 500 }}
+    >
       {showHeartBurst && (
         <HeartBurst onComplete={() => setShowHeartBurst(false)} />
       )}
 
-      <AnimatePresence mode="popLayout">
-        {!isFinished ? (
-          visibleStories.map((story, i) => (
-            <DraggableCard
-              key={story.id}
-              story={story}
-              onSwipe={handleSwipe}
-              isTop={i === 0}
-            />
-          ))
-        ) : (
-          <motion.div
-            className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-          >
-            <div className="text-6xl mb-4">
-              <svg
-                width="64"
-                height="64"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-                className="text-gate-red/30 mx-auto"
-              >
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
-              </svg>
-            </div>
-            <h3 className="font-display text-2xl font-bold text-fog-dark">
-              You&apos;ve read all the stories
-            </h3>
-            <p className="mt-2 text-ink-light font-body">
-              Come back soon for more tales from the city by the bay.
-            </p>
-            <button
-              onClick={() => setCurrentIndex(0)}
-              className="mt-6 px-6 py-3 bg-gate-red text-cream font-body font-semibold rounded-full hover:bg-gate-red-light transition-colors"
-            >
-              Start Over
-            </button>
-          </motion.div>
+      {/* Back card (static, peeking behind) */}
+      {nextStory && !isFinished && (
+        <div className="absolute inset-0 z-0 flex items-center justify-center">
+          <div className="w-full scale-[0.95] opacity-40 translate-y-2">
+            <StoryCard story={nextStory} />
+          </div>
+        </div>
+      )}
+
+      {/* Top card (draggable, animated) */}
+      <AnimatePresence mode="wait">
+        {topStory && !isFinished && (
+          <TopCard
+            key={topStory.id}
+            story={topStory}
+            onSwipe={handleSwipe}
+          />
         )}
       </AnimatePresence>
+
+      {/* Empty state */}
+      {isFinished && (
+        <motion.div
+          className="absolute inset-0 flex flex-col items-center justify-center text-center px-6"
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+        >
+          <svg
+            width="64"
+            height="64"
+            viewBox="0 0 24 24"
+            fill="currentColor"
+            className="text-gate-red/30 mx-auto mb-4"
+          >
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" />
+          </svg>
+          <h3 className="font-display text-2xl font-bold text-fog-dark">
+            You&apos;ve read all the stories
+          </h3>
+          <p className="mt-2 text-ink-light font-body">
+            Come back soon for more tales from the city by the bay.
+          </p>
+          <button
+            onClick={() => setCurrentIndex(0)}
+            className="mt-6 px-6 py-3 bg-gate-red text-cream font-body font-semibold rounded-full hover:bg-gate-red-light transition-colors"
+          >
+            Start Over
+          </button>
+        </motion.div>
+      )}
 
       {/* Navigation buttons */}
       {!isFinished && (
@@ -234,7 +242,16 @@ export default function CardStack({ stories }: CardStackProps) {
             className="w-14 h-14 rounded-full bg-white shadow-lg flex items-center justify-center text-bay hover:bg-bay hover:text-white transition-colors"
             title="Next story"
           >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <path d="M18 6L6 18M6 6l12 12" />
             </svg>
           </button>
