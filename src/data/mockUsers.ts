@@ -41,4 +41,42 @@ export const mockUsers: UserProfile[] = [
     },
     joinedDate: "2026-03-01",
   },
+  {
+    id: "user-5",
+    displayName: "Danny R.",
+    bio: "Filipino-American. Born in Cebu, raised in LA. SF got me good.",
+    socialLinks: {
+      instagram: "https://instagram.com/dannyrey",
+      twitter: "https://twitter.com/dannyrey_",
+    },
+    joinedDate: "2025-12-10",
+  },
+  {
+    id: "user-6",
+    displayName: "Priya M.",
+    bio: "Med student on a gap year. Wasn't supposed to fall for anyone.",
+    socialLinks: {
+      instagram: "https://instagram.com/priya.m",
+    },
+    joinedDate: "2026-01-28",
+  },
+  {
+    id: "user-7",
+    displayName: "Tomás G.",
+    bio: "From Mexico City. Came for a tech conference. Stayed in my head forever.",
+    socialLinks: {
+      twitter: "https://twitter.com/tomasg",
+      website: "https://tomasg.mx",
+    },
+    joinedDate: "2026-03-10",
+  },
+  {
+    id: "user-8",
+    displayName: "Suki L.",
+    bio: "23. Nurse. Terrible at goodbyes.",
+    socialLinks: {
+      instagram: "https://instagram.com/sukiii.l",
+    },
+    joinedDate: "2026-02-15",
+  },
 ];
