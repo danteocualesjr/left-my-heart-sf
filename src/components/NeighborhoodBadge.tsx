@@ -10,12 +10,13 @@ export default function NeighborhoodBadge({ name }: NeighborhoodBadgeProps) {
 
   return (
     <span
-      className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-body font-semibold uppercase tracking-wider text-white"
-      style={{ backgroundColor: accent }}
+      className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md text-[10px] font-body font-bold uppercase tracking-widest"
+      style={{ color: accent, backgroundColor: `${accent}14` }}
     >
-      <svg width="8" height="8" viewBox="0 0 8 8" fill="currentColor">
-        <circle cx="4" cy="4" r="3" opacity="0.5" />
-      </svg>
+      <span
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ backgroundColor: accent }}
+      />
       {name}
     </span>
   );

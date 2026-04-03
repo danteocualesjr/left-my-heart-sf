@@ -3,125 +3,142 @@
 import { motion } from "framer-motion";
 import Link from "next/link";
 
-function GoldenGateSVG() {
+function BridgeSilhouette() {
   return (
     <svg
-      viewBox="0 0 1200 400"
-      className="w-full h-auto opacity-20"
+      viewBox="0 0 1440 320"
+      className="w-full h-auto"
       fill="none"
       xmlns="http://www.w3.org/2000/svg"
+      preserveAspectRatio="none"
     >
-      {/* Main cables */}
+      {/* Water */}
+      <rect y="280" width="1440" height="40" className="fill-bay-dark/20" />
+
+      {/* Main cable */}
       <path
-        d="M0 300 Q300 50 600 200 Q900 350 1200 100"
+        d="M0 240 Q360 60 720 180 Q1080 300 1440 120"
         stroke="currentColor"
-        strokeWidth="4"
-        className="text-gate-red"
+        strokeWidth="3"
+        className="text-gate-red/30"
       />
-      <path
-        d="M0 310 Q300 60 600 210 Q900 360 1200 110"
-        stroke="currentColor"
-        strokeWidth="2"
-        className="text-gate-red/50"
-      />
-      {/* Towers */}
-      <rect x="280" y="80" width="12" height="280" rx="2" className="fill-gate-red" />
-      <rect x="308" y="80" width="12" height="280" rx="2" className="fill-gate-red" />
-      <rect x="280" y="80" width="40" height="12" rx="2" className="fill-gate-red" />
-      <rect x="280" y="140" width="40" height="8" rx="2" className="fill-gate-red" />
-      <rect x="880" y="130" width="12" height="230" rx="2" className="fill-gate-red" />
-      <rect x="908" y="130" width="12" height="230" rx="2" className="fill-gate-red" />
-      <rect x="880" y="130" width="40" height="12" rx="2" className="fill-gate-red" />
-      <rect x="880" y="190" width="40" height="8" rx="2" className="fill-gate-red" />
+
+      {/* Tower 1 */}
+      <rect x="340" y="80" width="8" height="200" rx="2" className="fill-gate-red/25" />
+      <rect x="360" y="80" width="8" height="200" rx="2" className="fill-gate-red/25" />
+      <rect x="336" y="76" width="36" height="10" rx="2" className="fill-gate-red/25" />
+      <rect x="336" y="120" width="36" height="6" rx="1" className="fill-gate-red/20" />
+      <rect x="336" y="160" width="36" height="6" rx="1" className="fill-gate-red/20" />
+
+      {/* Tower 2 */}
+      <rect x="1060" y="130" width="8" height="150" rx="2" className="fill-gate-red/25" />
+      <rect x="1080" y="130" width="8" height="150" rx="2" className="fill-gate-red/25" />
+      <rect x="1056" y="126" width="36" height="10" rx="2" className="fill-gate-red/25" />
+      <rect x="1056" y="170" width="36" height="6" rx="1" className="fill-gate-red/20" />
+
       {/* Vertical cables */}
-      {[320, 360, 400, 440, 480, 520, 560, 600, 640, 680, 720, 760, 800, 840].map(
-        (x, i) => (
+      {Array.from({ length: 20 }).map((_, i) => {
+        const x = 380 + i * 35;
+        if (x > 1050) return null;
+        const cableY = 180 + Math.sin((x - 360) * 0.003) * 80;
+        return (
           <line
             key={i}
             x1={x}
-            y1={200 + Math.sin((x - 300) * 0.005) * 100}
+            y1={Math.min(cableY, 275)}
             x2={x}
-            y2="360"
+            y2="275"
             stroke="currentColor"
-            strokeWidth="1"
-            className="text-gate-red/30"
+            strokeWidth="0.8"
+            className="text-gate-red/15"
           />
-        )
-      )}
+        );
+      })}
+
       {/* Road deck */}
-      <rect x="0" y="355" width="1200" height="6" rx="1" className="fill-gate-red/40" />
+      <rect x="0" y="275" width="1440" height="4" rx="1" className="fill-gate-red/20" />
     </svg>
   );
 }
 
-function FogLayer({ delay, y }: { delay: number; y: string }) {
+function FogLayer({ delay, y, opacity }: { delay: number; y: string; opacity: number }) {
   return (
     <motion.div
       className="absolute inset-x-0 pointer-events-none"
       style={{ top: y }}
-      animate={{ x: ["-10%", "10%", "-10%"], opacity: [0.3, 0.6, 0.3] }}
-      transition={{ duration: 20, repeat: Infinity, delay, ease: "easeInOut" }}
+      animate={{ x: ["-8%", "8%", "-8%"], opacity: [opacity * 0.5, opacity, opacity * 0.5] }}
+      transition={{ duration: 25, repeat: Infinity, delay, ease: "easeInOut" }}
     >
-      <div className="w-[120%] h-24 bg-gradient-to-r from-transparent via-white/30 to-transparent blur-3xl" />
+      <div className="w-[120%] h-32 bg-gradient-to-r from-transparent via-white/20 to-transparent blur-3xl" />
     </motion.div>
   );
 }
 
 export default function HeroSection() {
   return (
-    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-fog-dark via-fog to-fog-light">
-      {/* Fog animations */}
-      <FogLayer delay={0} y="20%" />
-      <FogLayer delay={5} y="50%" />
-      <FogLayer delay={10} y="75%" />
+    <section className="relative min-h-screen flex flex-col items-center justify-center overflow-hidden bg-gradient-to-b from-[#111822] via-fog-dark to-fog">
+      {/* Fog layers */}
+      <FogLayer delay={0} y="15%" opacity={0.4} />
+      <FogLayer delay={6} y="40%" opacity={0.3} />
+      <FogLayer delay={12} y="65%" opacity={0.5} />
 
-      {/* Bridge illustration */}
-      <div className="absolute bottom-0 left-0 right-0 px-4">
-        <GoldenGateSVG />
-      </div>
-
-      {/* Stars / city lights */}
+      {/* City lights */}
       <div className="absolute inset-0 pointer-events-none">
-        {Array.from({ length: 30 }).map((_, i) => (
+        {Array.from({ length: 40 }).map((_, i) => (
           <motion.div
             key={i}
-            className="absolute w-1 h-1 rounded-full bg-sunset-light"
+            className="absolute rounded-full"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 60}%`,
+              left: `${5 + Math.random() * 90}%`,
+              top: `${10 + Math.random() * 55}%`,
+              width: `${1 + Math.random() * 2}px`,
+              height: `${1 + Math.random() * 2}px`,
+              backgroundColor: i % 3 === 0 ? "#F39C12" : i % 3 === 1 ? "#FDF6E3" : "#E74C3C",
             }}
-            animate={{ opacity: [0.2, 0.8, 0.2] }}
+            animate={{ opacity: [0.1, 0.6, 0.1] }}
             transition={{
-              duration: 2 + Math.random() * 3,
+              duration: 2 + Math.random() * 4,
               repeat: Infinity,
-              delay: Math.random() * 2,
+              delay: Math.random() * 3,
             }}
           />
         ))}
       </div>
 
+      {/* Bridge at bottom */}
+      <div className="absolute bottom-8 left-0 right-0 opacity-60">
+        <BridgeSilhouette />
+      </div>
+
       {/* Content */}
       <div className="relative z-10 text-center px-6 max-w-3xl mx-auto">
-        <motion.div
+        <motion.p
+          className="text-[11px] font-body font-bold uppercase tracking-[0.3em] text-gate-red-light/60 mb-6"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.8 }}
+        >
+          A place for love stories
+        </motion.p>
+
+        <motion.h1
+          className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-cream leading-[1.1] tracking-tight"
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut" }}
         >
-          <h1 className="font-display text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold text-cream leading-tight tracking-tight">
-            I Left My Heart
-            <br />
-            <span className="text-gate-red-light">in San Francisco</span>
-          </h1>
-        </motion.div>
+          I Left My Heart
+          <br />
+          <span className="italic text-gate-red-light">in San Francisco</span>
+        </motion.h1>
 
         <motion.p
-          className="mt-6 text-lg sm:text-xl text-cream/70 font-body max-w-xl mx-auto text-balance"
+          className="mt-6 text-base sm:text-lg text-cream/50 font-body max-w-md mx-auto leading-relaxed"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, delay: 0.3 }}
         >
           Stories of love found and lost in the city by the bay.
-          <br className="hidden sm:block" />
           Share yours. Read theirs. Feel everything.
         </motion.p>
 
@@ -133,31 +150,31 @@ export default function HeroSection() {
         >
           <Link
             href="/stories"
-            className="px-8 py-4 bg-gate-red text-cream font-body font-semibold text-lg rounded-full hover:bg-gate-red-light transition-colors shadow-lg hover:shadow-xl"
+            className="group px-8 py-4 bg-gate-red text-cream font-body font-semibold text-base rounded-full hover:bg-gate-red-light transition-all shadow-lg hover:shadow-xl hover:shadow-gate-red/20 active:scale-95"
           >
             Read Stories
+            <span className="inline-block ml-2 transition-transform group-hover:translate-x-1">&rarr;</span>
           </Link>
           <Link
             href="/write"
-            className="px-8 py-4 bg-transparent border-2 border-cream/40 text-cream font-body font-semibold text-lg rounded-full hover:bg-cream/10 transition-colors"
+            className="px-8 py-4 bg-cream/5 border border-cream/20 text-cream/80 font-body font-semibold text-base rounded-full hover:bg-cream/10 hover:text-cream transition-all active:scale-95"
           >
             Share Your Story
           </Link>
         </motion.div>
 
         <motion.p
-          className="mt-16 text-cream/40 text-sm font-body italic"
+          className="mt-20 text-cream/25 text-xs font-body italic"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{ duration: 1, delay: 1.2 }}
         >
-          &ldquo;The coldest winter I ever spent was a summer in San
-          Francisco.&rdquo;
+          &ldquo;The coldest winter I ever spent was a summer in San Francisco.&rdquo;
         </motion.p>
       </div>
 
-      {/* Bottom gradient fade */}
-      <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-warm-white to-transparent" />
+      {/* Bottom fade */}
+      <div className="absolute bottom-0 left-0 right-0 h-40 bg-gradient-to-t from-warm-white to-transparent" />
     </section>
   );
 }
