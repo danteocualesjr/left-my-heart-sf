@@ -15,9 +15,26 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Left My Heart in SF",
+  title: {
+    default: "Left My Heart in SF",
+    template: "%s | Left My Heart in SF",
+  },
   description:
     "Stories of love found and lost in the city by the bay. Share your San Francisco love story.",
+  openGraph: {
+    title: "Left My Heart in SF",
+    description:
+      "Stories of love found and lost in the city by the bay.",
+    siteName: "Left My Heart in SF",
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Left My Heart in SF",
+    description:
+      "Stories of love found and lost in the city by the bay.",
+  },
 };
 
 export default function RootLayout({
